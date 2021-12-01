@@ -1,7 +1,7 @@
 lio_sam:
 
   # Topics
-  pointCloudTopic: "merged_cloud"               # Point cloud data "points_raw"
+  pointCloudTopic: "points_raw"               # Point cloud data
   imuTopic: "imu_raw"                         # IMU data
   odomTopic: "odometry/imu"                   # IMU pre-preintegration odometry, same frequency as IMU
   gpsTopic: "odometry/gpsz"                   # GPS odometry topic from navsat, see module_navsat.launch file
@@ -20,14 +20,14 @@ lio_sam:
   
   # Export settings
   savePCD: false                              # https://github.com/TixiaoShan/LIO-SAM/issues/3
-  savePCDDirectory: "/Downloads/LIOSAM/"        # in your home folder, starts and ends with "/". Warning: the code deletes "LOAM" folder then recreates it. See "mapOptimization" for implementation
+  savePCDDirectory: "/Downloads/LOAM/"        # in your home folder, starts and ends with "/". Warning: the code deletes "LOAM" folder then recreates it. See "mapOptimization" for implementation
 
   # Sensor Settings
   sensor: velodyne                            # lidar sensor type, either 'velodyne' or 'ouster'
   N_SCAN: 16                                  # number of lidar channel (i.e., 16, 32, 64, 128)
   Horizon_SCAN: 1800                          # lidar horizontal resolution (Velodyne:1800, Ouster:512,1024,2048)
   downsampleRate: 1                           # default: 1. Downsample your data if too many points. i.e., 16 = 64 / 4, 16 = 16 / 1
-  lidarMinRange: 0.1                          # default: 1.0, minimum lidar range to be used
+  lidarMinRange: 1.0                          # default: 1.0, minimum lidar range to be used
   lidarMaxRange: 1000.0                       # default: 1000.0, maximum lidar range to be used
 
   # IMU Settings
@@ -70,12 +70,12 @@ lio_sam:
 
   # CPU Params
   numberOfCores: 4                              # number of cores for mapping optimization
-  mappingProcessInterval: 0.1                  # seconds, regulate mapping frequency
+  mappingProcessInterval: 0.15                  # seconds, regulate mapping frequency
 
   # Surrounding map
-  surroundingkeyframeAddingDistThreshold: 0.0   # meters, regulate keyframe adding threshold
-  surroundingkeyframeAddingAngleThreshold: 0.0  # radians, regulate keyframe adding threshold
-  surroundingKeyframeDensity: 0.0               # meters, downsample surrounding keyframe poses   
+  surroundingkeyframeAddingDistThreshold: 1.0   # meters, regulate keyframe adding threshold
+  surroundingkeyframeAddingAngleThreshold: 0.2  # radians, regulate keyframe adding threshold
+  surroundingKeyframeDensity: 2.0               # meters, downsample surrounding keyframe poses   
   surroundingKeyframeSearchRadius: 50.0         # meters, within n meters scan-to-map optimization (when loop closure disabled)
 
   # Loop closure
