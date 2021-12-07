@@ -34,6 +34,7 @@
 #include <tf/transform_listener.h>
 #include <tf/transform_datatypes.h>
 #include <tf/transform_broadcaster.h>
+#include <eigen_conversions/eigen_msg.h>
  
 #include <vector>
 #include <cmath>
@@ -260,8 +261,21 @@ public:
         imu_out.angular_velocity.y = gyr.y();
         imu_out.angular_velocity.z = gyr.z();
         // rotate roll pitch yaw
-        Eigen::Quaterniond q_from(imu_in.orientation.w, imu_in.orientation.x, imu_in.orientation.y, imu_in.orientation.z);
-        Eigen::Quaterniond q_final = q_from * extQRPY;
+        // Eigen::Quaterniond q_from(imu_in.orientation.w, imu_in.orientation.x, imu_in.orientation.y, imu_in.orientation.z);
+        // Eigen::Quaterniond q_final = q_from * extQRPY;
+        tf::Quaternion orientation;
+        double imuRoll, imuPitch, imuYaw;
+        tf::quaternionMsgToTF(imu_in.orientation, orientation);
+        tf::Matrix3x3(orientation).getRPY(imuRoll, imuPitch, imuYaw);
+        Eigen::Vector3d RPY;
+        Eigen::Vector3d RPY_Convert;
+        RPY << imuRoll,imuPitch, imuYaw;
+        RPY_Convert = extRPY * RPY;
+        geometry_msgs::Quaternion q_;
+        Eigen::Quaterniond q_final;
+        q_ = tf::createQuaternionMsgFromRollPitchYaw(RPY_Convert(0), RPY_Convert(1), RPY_Convert(2));
+        tf::quaternionMsgToEigen (q_, q_final);
+
         imu_out.orientation.x = q_final.x();
         imu_out.orientation.y = q_final.y();
         imu_out.orientation.z = q_final.z();
