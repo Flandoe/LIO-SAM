@@ -14,6 +14,9 @@
     <!--- Run Navsat -->
     <include file="$(find lio_sam)/launch/include/module_navsat.launch" />
 
+    <node pkg="lio_sam" type="pub_gnss_odom.py" name="pub_gnss_odom" respawn="true" output="screen">        
+    </node>
+
     <!--- Run Rviz-->
     <include file="$(find lio_sam)/launch/include/module_rviz.launch" />
 
