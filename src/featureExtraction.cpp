@@ -18,12 +18,14 @@ class FeatureExtraction : public ParamServer
 public:
 
     ros::Subscriber subLaserCloudInfo;
+    ros::Subscriber subLaserCloudInfo_save;
 
     ros::Publisher pubLaserCloudInfo;
     ros::Publisher pubCornerPoints;
     ros::Publisher pubSurfacePoints;
 
     pcl::PointCloud<PointType>::Ptr extractedCloud;
+    pcl::PointCloud<pcl::PointXYZI>::Ptr saveCloud;
     pcl::PointCloud<PointType>::Ptr cornerCloud;
     pcl::PointCloud<PointType>::Ptr surfaceCloud;
 
@@ -40,7 +42,7 @@ public:
     FeatureExtraction()
     {
         subLaserCloudInfo = nh.subscribe<lio_sam::cloud_info>("lio_sam/deskew/cloud_info", 1, &FeatureExtraction::laserCloudInfoHandler, this, ros::TransportHints().tcpNoDelay());
-
+        //subLaserCloudInfo_save = nh.subscribe<lio_sam::cloud_info>("lio_sam/deskew/cloud_info", 1, &FeatureExtraction::savelaserCloudInfoHandler, this);
         pubLaserCloudInfo = nh.advertise<lio_sam::cloud_info> ("lio_sam/feature/cloud_info", 1);
         pubCornerPoints = nh.advertise<sensor_msgs::PointCloud2>("lio_sam/feature/cloud_corner", 1);
         pubSurfacePoints = nh.advertise<sensor_msgs::PointCloud2>("lio_sam/feature/cloud_surface", 1);
@@ -76,6 +78,23 @@ public:
         extractFeatures();
 
         publishFeatureCloud();
+    }
+
+    void savelaserCloudInfoHandler(const lio_sam::cloud_infoConstPtr& msgIn)
+    {
+        lio_sam::cloud_info cloudCp = *msgIn; // new cloud info
+        sensor_msgs::PointCloud2 cloud_ros = cloudCp.cloud_deskewed;
+        std::cout<<"save start"<<std::endl;
+        pcl::fromROSMsg(cloud_ros, *saveCloud);
+        std::cout<<"1"<<std::endl;
+        double timestamp = msgIn->header.stamp.toSec();
+        std::string dir = "scans";
+        std::cout<<"1"<<std::endl;
+        mkdir(dir.c_str(),0777);
+        std::cout<<"1"<<std::endl;
+        std::string file_name = "./scans/" + std::to_string(timestamp)+".pcd";
+        //pcl::io::savePCDFileBinary("file_name", *saveCloud);
+        std::cout<<"save end"<<std::endl;
     }
 
     void calculateSmoothness()
