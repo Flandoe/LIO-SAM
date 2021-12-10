@@ -354,12 +354,18 @@ public:
 
       cout << "****************************************************" << endl;
       cout << "Saving map to pcd files ..." << endl;
-      if(req.destination.empty()) saveMapDirectory = std::getenv("HOME") + savePCDDirectory;
-      else saveMapDirectory = std::getenv("HOME") + req.destination;
+    //   if(req.destination.empty()) saveMapDirectory = std::getenv("HOME") + savePCDDirectory;
+    //   else saveMapDirectory = std::getenv("HOME") + req.destination;
+    // no environment value "HOME"
+      if(req.destination.empty()) saveMapDirectory = savePCDDirectory;
+      else 
+      {
+        saveMapDirectory = req.destination;
+        // create directory and remove old files;
+        int unused = system((std::string("exec rm -r ") + saveMapDirectory).c_str());
+        unused = system((std::string("mkdir -p ") + saveMapDirectory).c_str());
+      }
       cout << "Save destination: " << saveMapDirectory << endl;
-      // create directory and remove old files;
-      int unused = system((std::string("exec rm -r ") + saveMapDirectory).c_str());
-      unused = system((std::string("mkdir -p ") + saveMapDirectory).c_str());
       // save key frame transformations
       pcl::io::savePCDFileBinary(saveMapDirectory + "/trajectory.pcd", *cloudKeyPoses3D);
       pcl::io::savePCDFileBinary(saveMapDirectory + "/transformations.pcd", *cloudKeyPoses6D);

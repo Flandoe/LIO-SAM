@@ -21,9 +21,9 @@ lio_sam:
   #For example, you will notice the trajectory is constantly corrected by GPS whey you set "poseCovThreshold" to 1.0.
   
   # Export settings
-  savePCD: false                              # https://github.com/TixiaoShan/LIO-SAM/issues/3 save map
-  savePCDDirectory: "/Downloads/LIOSAM/"        # in your home folder, starts and ends with "/". Warning: the code deletes "LOAM" folder then recreates it. See "mapOptimization" for implementation
-  saveScans: false                            # save every single point clouds
+  savePCD: true                              # https://github.com/TixiaoShan/LIO-SAM/issues/3 save map
+  savePCDDirectory: "/home/zs1010/Downloads/LIOSAM/"        # in your home folder, starts and ends with "/". Warning: the code deletes "LOAM" folder then recreates it. See "mapOptimization" for implementation
+  saveScans: true                            # save every single point clouds. If it is true, savePCD must be true, otherwise create a directory names scans in savePCDDirectory
 
   # Sensor Settings
   sensor: velodyne                            # lidar sensor type, either 'velodyne' or 'ouster'

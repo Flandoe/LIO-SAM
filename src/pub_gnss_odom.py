@@ -13,6 +13,7 @@ E0 = 0.0
 N0 = 0.0
 U0 = 0.0
 flag_initial = False
+path = ""
     
 def get_gnss_info (msg):
     global flag_initial
@@ -33,6 +34,10 @@ def get_gnss_info (msg):
         E0 = E
         N0 = N
         U0 = U
+        origin = [E0, N0, U0]
+        file = path + "Origin.txt"
+        print(file)
+        numpy.savetxt(file,origin,fmt="%.3f")
         E = 0.0
         N = 0.0
         U = 0.0
@@ -55,6 +60,7 @@ def get_gnss_info (msg):
  
 if __name__ == '__main__':
     rospy.init_node('pub_gnss_odom')
+    path = rospy.get_param("lio_sam/savePCDDirectory")
     pub_GNSS_fix = rospy.Publisher('/odometry/gps', Odometry, queue_size=200)
     sub = rospy.Subscriber ('/gnss_fix', NavSatFix, get_gnss_info, queue_size=200)
     rospy.spin()
