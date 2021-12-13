@@ -4,7 +4,7 @@ lio_sam:
   pointCloudTopic: "merged_cloud"               # Point cloud data "points_raw"
   imuTopic: "imu_raw"                         # IMU data
   odomTopic: "odometry/imu"                   # IMU pre-preintegration odometry, same frequency as IMU
-  gpsTopic: "odometry/gps"                   # GPS odometry topic from navsat, see module_navsat.launch file
+  gpsTopic: "odometry/gpsz"                   # GPS odometry topic from navsat, see module_navsat.launch file
 
   # Frames
   lidarFrame: "base_link"
@@ -13,8 +13,8 @@ lio_sam:
   mapFrame: "map"
 
   # GPS Settings
-  useImuHeadingInitialization: true           # if using GPS data, set to "true"
-  useGpsElevation: true                      # if GPS elevation is bad, set to "false"
+  useImuHeadingInitialization: false           # if using GPS data, set to "true"
+  useGpsElevation: false                      # if GPS elevation is bad, set to "false"
   gpsCovThreshold: 2.0                        # m^2, threshold for using GPS data, can be adjusted to filter bad GPS readings
   poseCovThreshold: 1.0                      # m^2, threshold for using GPS data
   #can be used to adjust the frequency of adding GPS factor to the graph.

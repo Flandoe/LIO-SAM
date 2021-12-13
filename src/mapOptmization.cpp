@@ -2,6 +2,8 @@
 #include "lio_sam/cloud_info.h"
 #include "lio_sam/save_map.h"
 
+#include "boost/filesystem.hpp"   
+
 #include <gtsam/geometry/Rot3.h>
 #include <gtsam/geometry/Pose3.h>
 #include <gtsam/slam/PriorFactor.h>
@@ -380,6 +382,7 @@ public:
           *globalSurfCloud   += *transformPointCloud(surfCloudKeyFrames[i],    &cloudKeyPoses6D->points[i]);
           cout << "\r" << std::flush << "Processing feature cloud " << i << " of " << cloudKeyPoses6D->size() << " ...";
       }
+      cout << endl;
 
       if(req.resolution != 0)
       {
@@ -415,47 +418,51 @@ public:
       downSizeFilterSurf.setLeafSize(mappingSurfLeafSize, mappingSurfLeafSize, mappingSurfLeafSize);
 
       // save dense map
-      std::cout<<std::endl<<"Saving DenseMap. MaxDistance(m): "<<denseMapMaxd<<" MinDistance(m): "<< 1.0<<std::endl;
-      pcl::PointCloud<pcl::PointXYZI>::Ptr cloud_ALL(new pcl::PointCloud<pcl::PointXYZI>);
-      for(PointXYZIRPYT point:*cloudKeyPoses6D)
-      {	
-          std::stringstream ss;
-          ss << std::fixed << std::setprecision(6) << point.time;
-          std::string s = ss.str();
-          //std::cout<<s<<std::endl;
-          std::string file_name =savePCDDirectory + "scans/" + s + ".pcd";
-  
-          Eigen::Vector3f t;
-          t <<  point.x, point.y, point.z;	
-  
-          float roll = point.roll;
-          float pitch = point.pitch;
-          float yaw = point.yaw;
-          Eigen::Matrix3f rotation_matrix;
-          float cr = cos(roll); float sr = sin(roll);
-          float cp = cos(pitch); float sp = sin(pitch);
-          float cy = cos(yaw); float sy = sin(yaw);
-          rotation_matrix << cy * cp, cy* sp* sr - sy * cr, sy* sr + cy * cr * sp,
-          sy* cp, cy* cr + sy * sr * sp, sp* sy* cr - cy * sr,
-          -sp, cp* sr, cp* cr;
-  
-          Eigen::Matrix4f T;
-          T.setIdentity();
-          T.block<3,3>(0,0) = rotation_matrix;
-          T.topRightCorner<3, 1>() = t;
-  
-          pcl::PointCloud<pcl::PointXYZI>::Ptr cloud_tmp(new pcl::PointCloud<pcl::PointXYZI>);
-          pcl::PointCloud<pcl::PointXYZI>::Ptr ptr_cut(new pcl::PointCloud<pcl::PointXYZI>);
-          if (pcl::io::loadPCDFile<pcl::PointXYZI>(file_name, *cloud_tmp) == -1)
-          {
-              PCL_ERROR("Couldn't read file cloud_tmp \n"); //文件不存在
-              continue;
-          }
-          cut_pointcloud(cloud_tmp, ptr_cut, denseMapMaxd, 1.0);
-          pcl::transformPointCloud(*ptr_cut, *ptr_cut, T);
-          *cloud_ALL += *ptr_cut;
+      std::string scans_path = savePCDDirectory + "scans/";
+      if ( !boost::filesystem::exists(scans_path) )//check paths
+      {
+          std::cout<<"\033[1;31mError: " << scans_path<<" does not exist!\033[0m"<<std::endl;
       }
-      pcl::io::savePCDFileBinary((savePCDDirectory+"DenseMap.pcd"), *cloud_ALL);
+      else
+      {
+          std::cout<<"Saving DenseMap. MaxDistance(m): "<<denseMapMaxd<<" MinDistance(m): "<< 1.0<<std::endl;
+          pcl::PointCloud<pcl::PointXYZI>::Ptr cloud_ALL(new pcl::PointCloud<pcl::PointXYZI>);
+          for(PointXYZIRPYT point:*cloudKeyPoses6D)
+          {	
+              std::stringstream ss;
+              ss << std::fixed << std::setprecision(6) << point.time;
+              std::string s = ss.str();
+              //std::cout<<s<<std::endl;
+              std::string file_name = scans_path + s + ".pcd";  
+              Eigen::Vector3f t;
+              t <<  point.x, point.y, point.z;	  
+              float roll = point.roll;
+              float pitch = point.pitch;
+              float yaw = point.yaw;
+              Eigen::Matrix3f rotation_matrix;
+              float cr = cos(roll); float sr = sin(roll);
+              float cp = cos(pitch); float sp = sin(pitch);
+              float cy = cos(yaw); float sy = sin(yaw);
+              rotation_matrix << cy * cp, cy* sp* sr - sy * cr, sy* sr + cy * cr * sp,
+              sy* cp, cy* cr + sy * sr * sp, sp* sy* cr - cy * sr,
+              -sp, cp* sr, cp* cr;  
+              Eigen::Matrix4f T;
+              T.setIdentity();
+              T.block<3,3>(0,0) = rotation_matrix;
+              T.topRightCorner<3, 1>() = t;  
+              pcl::PointCloud<pcl::PointXYZI>::Ptr cloud_tmp(new pcl::PointCloud<pcl::PointXYZI>);
+              pcl::PointCloud<pcl::PointXYZI>::Ptr ptr_cut(new pcl::PointCloud<pcl::PointXYZI>);
+              if (pcl::io::loadPCDFile<pcl::PointXYZI>(file_name, *cloud_tmp) == -1)
+              {
+                  PCL_ERROR("Couldn't read file cloud_tmp \n"); //文件不存在
+                  continue;
+              }
+              cut_pointcloud(cloud_tmp, ptr_cut, denseMapMaxd, 1.0);
+              pcl::transformPointCloud(*ptr_cut, *ptr_cut, T);
+              *cloud_ALL += *ptr_cut;
+          }
+          pcl::io::savePCDFileBinary((savePCDDirectory+"DenseMap.pcd"), *cloud_ALL);
+      }
 
       cout << "****************************************************" << endl;
       cout << "Saving map to pcd files completed\n" << endl;
