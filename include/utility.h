@@ -353,4 +353,22 @@ float pointDistance(PointType p1, PointType p2)
     return sqrt((p1.x-p2.x)*(p1.x-p2.x) + (p1.y-p2.y)*(p1.y-p2.y) + (p1.z-p2.z)*(p1.z-p2.z));
 }
 
+//remove max and min points of point cloud
+void cut_pointcloud(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud_in, pcl::PointCloud<pcl::PointXYZI>::Ptr cloud_out, double max, double min)
+{
+	for (pcl::PointCloud<pcl::PointXYZI>::iterator index = cloud_in->begin(); index != cloud_in->end(); ++index)
+	{
+		pcl::PointXYZI point;
+		point.x = index->x;
+		point.y = index->y;
+		point.z = index->z;
+		point.intensity = index->intensity;
+		float pow = point.x * point.x + point.y * point.y + point.z * point.z;
+		if (pow < (max * max) && pow >(min * min))
+		{
+			cloud_out->push_back(point);
+		}
+	}
+}
+
 #endif

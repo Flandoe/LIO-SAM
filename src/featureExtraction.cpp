@@ -18,6 +18,7 @@ class FeatureExtraction : public ParamServer
 public:
 
     ros::Subscriber subLaserCloudInfo;
+    ros::Subscriber subLaserCloudInfo_save;
 
     ros::Publisher pubLaserCloudInfo;
     ros::Publisher pubCornerPoints;
@@ -40,6 +41,13 @@ public:
     FeatureExtraction()
     {
         subLaserCloudInfo = nh.subscribe<lio_sam::cloud_info>("lio_sam/deskew/cloud_info", 1, &FeatureExtraction::laserCloudInfoHandler, this, ros::TransportHints().tcpNoDelay());
+
+        {
+            subLaserCloudInfo_save = nh.subscribe<lio_sam::cloud_info>("lio_sam/deskew/cloud_info", 100, &FeatureExtraction::savelaserCloudInfoHandler, this);
+            // create directory and remove old files;
+            string saveScansDirectory = savePCDDirectory + "scans/";
+            int unused = system((std::string("mkdir -p ") + saveScansDirectory).c_str());//for saving scans
+        }
 
         pubLaserCloudInfo = nh.advertise<lio_sam::cloud_info> ("lio_sam/feature/cloud_info", 1);
         pubCornerPoints = nh.advertise<sensor_msgs::PointCloud2>("lio_sam/feature/cloud_corner", 1);
@@ -76,6 +84,16 @@ public:
         extractFeatures();
 
         publishFeatureCloud();
+    }
+    void savelaserCloudInfoHandler(const lio_sam::cloud_infoConstPtr& msgIn)
+    {
+       sensor_msgs::PointCloud2 cloud_ros = msgIn->cloud_deskewed;
+       pcl::PointCloud<pcl::PointXYZI>::Ptr saveCloud_ptr(new pcl::PointCloud<pcl::PointXYZI>);
+       pcl::fromROSMsg(cloud_ros, *saveCloud_ptr);     
+       double timestamp = msgIn->header.stamp.toSec();
+
+       std::string file_name = savePCDDirectory + "scans/" + std::to_string(timestamp)+".pcd";
+       pcl::io::savePCDFileBinary(file_name, *saveCloud_ptr);
     }
 
     void calculateSmoothness()
