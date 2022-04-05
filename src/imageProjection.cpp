@@ -149,29 +149,29 @@ public:
         std::lock_guard<std::mutex> lock1(imuLock);
         imuQueue.push_back(thisImu);
 
-        // // debug IMU data
-        // double imuRoll, imuPitch, imuYaw;
-        // tf::Quaternion orientation_raw;
-        // tf::quaternionMsgToTF(imuMsg->orientation, orientation_raw);
-        // tf::Matrix3x3(orientation_raw).getRPY(imuRoll, imuPitch, imuYaw);
-        // cout << "RAW IMU roll pitch yaw: " << endl;
-        // cout << "roll: " << imuRoll*180.0/3.14159 <<endl<< ", pitch: " << imuPitch*180.0/3.14159 <<endl<< ", yaw: " << imuYaw*180.0/3.14159 << endl << endl;
+        // debug IMU data
+        double imuRoll, imuPitch, imuYaw;
+        tf::Quaternion orientation_raw;
+        tf::quaternionMsgToTF(imuMsg->orientation, orientation_raw);
+        tf::Matrix3x3(orientation_raw).getRPY(imuRoll, imuPitch, imuYaw);
+        cout << "RAW IMU roll pitch yaw: " << endl;
+        cout << "roll: " << imuRoll*180.0/3.14159 <<endl<< ", pitch: " << imuPitch*180.0/3.14159 <<endl<< ", yaw: " << imuYaw*180.0/3.14159 << endl << endl;
        
-        // cout << std::setprecision(6);
-        // cout << "IMU acc: " << endl;
-        // cout << "x: " << thisImu.linear_acceleration.x << endl<<
-        //       ", y: " << thisImu.linear_acceleration.y << endl<<
-        //       ", z: " << thisImu.linear_acceleration.z << endl;
-        // cout << "IMU gyro: " << endl;
-        // cout << "x: " << thisImu.angular_velocity.x << endl<<
-        //       ", y: " << thisImu.angular_velocity.y << endl<<
-        //       ", z: " << thisImu.angular_velocity.z << endl;
+        cout << std::setprecision(6);
+        cout << "IMU acc: " << endl;
+        cout << "x: " << thisImu.linear_acceleration.x << endl<<
+              ", y: " << thisImu.linear_acceleration.y << endl<<
+              ", z: " << thisImu.linear_acceleration.z << endl;
+        cout << "IMU gyro: " << endl;
+        cout << "x: " << thisImu.angular_velocity.x << endl<<
+              ", y: " << thisImu.angular_velocity.y << endl<<
+              ", z: " << thisImu.angular_velocity.z << endl;
         
-        // tf::Quaternion orientation;
-        // tf::quaternionMsgToTF(thisImu.orientation, orientation);
-        // tf::Matrix3x3(orientation).getRPY(imuRoll, imuPitch, imuYaw);
-        // cout << "IMU roll pitch yaw: " << endl;
-        // cout << "roll: " << imuRoll*180.0/3.14159 <<endl<< ", pitch: " << imuPitch*180.0/3.14159 <<endl<< ", yaw: " << imuYaw*180.0/3.14159 << endl << endl;
+        tf::Quaternion orientation;
+        tf::quaternionMsgToTF(thisImu.orientation, orientation);
+        tf::Matrix3x3(orientation).getRPY(imuRoll, imuPitch, imuYaw);
+        cout << "IMU roll pitch yaw: " << endl;
+        cout << "roll: " << imuRoll*180.0/3.14159 <<endl<< ", pitch: " << imuPitch*180.0/3.14159 <<endl<< ", yaw: " << imuYaw*180.0/3.14159 << endl << endl;
     }
 
     void odometryHandler(const nav_msgs::Odometry::ConstPtr& odometryMsg)
