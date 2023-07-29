@@ -16,23 +16,22 @@ lio_sam:
   useImuHeadingInitialization: true           # if using GPS data, set to "true"
   useGpsElevation: true                      # if GPS elevation is bad, set to "false"
   gpsCovThreshold: 2.0                        # m^2, threshold for using GPS data, can be adjusted to filter bad GPS readings
-  poseCovThreshold: 1.0                      # m^2, threshold for using GPS data
+  poseCovThreshold: 25.0                      # m^2, threshold for using GPS data
   #can be used to adjust the frequency of adding GPS factor to the graph.
   #For example, you will notice the trajectory is constantly corrected by GPS whey you set "poseCovThreshold" to 1.0.
   
   # Export settings
-  savePCD: true                              # https://github.com/TixiaoShan/LIO-SAM/issues/3 save map
-  savePCDDirectory: "/home/mic/Downloads/LIOSAM/"        # in your home folder, starts and ends with "/". Warning: the code deletes "LOAM" folder then recreates it. See "mapOptimization" for implementation
-  saveScans: true                            # save every single point clouds. If it is true, savePCD must be true, otherwise create a directory names scans in savePCDDirectory
-  denseMapMaxd: 30.0                          # max saved distance in the dense map
+  savePCD: false                              # https://github.com/TixiaoShan/LIO-SAM/issues/3 save map
+  savePCDDirectory: "/Downloads/LIOSAM/"        # in your home folder, starts and ends with "/". Warning: the code deletes "LOAM" folder then recreates it. See "mapOptimization" for implementation
+  saveScans: false                            # save every single point clouds
 
   # Sensor Settings
   sensor: velodyne                            # lidar sensor type, either 'velodyne' or 'ouster'
-  N_SCAN: 48                                  # number of lidar channel (i.e., 16, 32, 64, 128)
-  Horizon_SCAN: 900                          # lidar horizontal resolution (Velodyne:1800, Ouster:512,1024,2048)
+  N_SCAN: 32                                  # number of lidar channel (i.e., 16, 32, 64, 128)
+  Horizon_SCAN: 1800                          # lidar horizontal resolution (Velodyne:1800, Ouster:512,1024,2048)
   downsampleRate: 1                           # default: 1. Downsample your data if too many points. i.e., 16 = 64 / 4, 16 = 16 / 1
   lidarMinRange: 0.1                          # default: 1.0, minimum lidar range to be used
-  lidarMaxRange: 200.0                       # default: 1000.0, maximum lidar range to be used
+  lidarMaxRange: 1000.0                       # default: 1000.0, maximum lidar range to be used
 
   # IMU Settings
   imuAccNoise: 3.9939570888238808e-03
@@ -43,20 +42,19 @@ lio_sam:
   imuRPYWeight: 0.01
 
   # Extrinsics (lidar -> IMU)
-  # extrinsicTrans: [0.0, 0.0, 0.0]
-  # extrinsicRot: [-1, 0, 0,
+  extrinsicTrans: [0.0, 0.0, 0.0]
+  extrinsicRot: [-1, 0, 0,
+                  0, 1, 0,
+                  0, 0, -1]
+  extrinsicRPY: [-1, 0, 0,
+                  0, 1, 0,
+                  0, 0, -1]
+  # extrinsicRot: [1, 0, 0,
   #                 0, 1, 0,
-  #                 0, 0, -1]
-  # extrinsicRPY: [-1, 0, 0,
+  #                 0, 0, 1]
+  # extrinsicRPY: [1, 0, 0,
   #                 0, 1, 0,
-  #                 0, 0, -1]
-  extrinsicTrans: [0.006, 0.012, 0.071]
-  extrinsicRot: [0.0, 1.0, 0.0,
--1.0, 0.0, 0.0,
-0.0, 0.0, 1.0]
-  extrinsicRPY: [0.0, 1.0, 0.0,
--1.0, 0.0, 0.0,
-0.0, 0.0, 1.0]
+  #                 0, 0, 1]
 
   # LOAM feature threshold
   edgeThreshold: 1.0
