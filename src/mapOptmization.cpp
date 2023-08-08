@@ -371,6 +371,30 @@ public:
       // save key frame transformations
       pcl::io::savePCDFileBinary(saveMapDirectory + "/trajectory.pcd", *cloudKeyPoses3D);
       pcl::io::savePCDFileBinary(saveMapDirectory + "/transformations.pcd", *cloudKeyPoses6D);
+      // save key frame transformations txt   
+      std::ofstream file_d;
+      file_d.setf(std::ios::fixed, std::ios::floatfield);//设置浮点数以固定的小数位数显示,数据类型为float
+      file_d.open(saveMapDirectory+"/transformations.txt", std::ios::app);//app是追加,out是覆盖，默认模式就是覆盖
+      if (!file_d)
+      {
+        std::cout << "Unable to open the file_distance.txt file!" << std::endl;
+      }
+      else
+      {
+        for(auto a : *cloudKeyPoses6D)
+        {
+            file_d << std::setprecision(6)
+                << a.time  << " "
+                << a.x << " "
+                << a.y << " "
+                << a.z << " "
+                << a.roll << " "
+                << a.pitch << " "
+                << a.yaw << " "
+                << std::endl;
+         }
+      }
+      file_d.close();
       // extract global point cloud map
       pcl::PointCloud<PointType>::Ptr globalCornerCloud(new pcl::PointCloud<PointType>());
       pcl::PointCloud<PointType>::Ptr globalCornerCloudDS(new pcl::PointCloud<PointType>());
