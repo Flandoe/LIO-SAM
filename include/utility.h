@@ -53,12 +53,46 @@
 #include <array>
 #include <thread>
 #include <mutex>
+#include <ctime>
+#include <chrono>
+#include <stdio.h>
 
 using namespace std;
 
 typedef pcl::PointXYZI PointType;
 
 enum class SensorType { VELODYNE, OUSTER };
+
+class Timer
+{
+public:
+    Timer(const char *nameIn)
+    {
+        name = nameIn;
+        tic();
+    }
+
+    void tic()
+    {
+        start = std::chrono::system_clock::now();
+    }
+
+    double toc()
+    {
+        end = std::chrono::system_clock::now();
+        std::chrono::duration<double> dt = end - start;
+        return dt.count() * 1000;
+    }
+
+    void tic_toc()
+    {
+        printf("The process %s takes %f ms.\n", name, toc());
+    }
+
+private:
+    const char* name;
+    std::chrono::time_point<std::chrono::system_clock> start, end;
+};
 
 class ParamServer
 {
