@@ -235,7 +235,6 @@ public:
 
     void laserCloudInfoHandler(const lio_sam::cloud_infoConstPtr& msgIn)
     {
-        Timer t_odm("LidarOdometry");
         // extract time stamp
         timeLaserInfoStamp = msgIn->header.stamp;
         timeLaserInfoCur = msgIn->header.stamp.toSec();
@@ -253,12 +252,16 @@ public:
             timeLastProcessing = timeLaserInfoCur;
 
             updateInitialGuess();
-
+            Timer t_odm("LidarOdometry");
             extractSurroundingKeyFrames();
 
             downsampleCurrentScan();
 
             scan2MapOptimization();
+            std::cout<<"odom_pub_cnt: "<<++odom_pub_cnt<<std::endl;
+            t_odm.tic_toc();
+            runtime += t_odm.toc();
+            std::cout<<"Odometry average run time: "<<runtime / odom_pub_cnt<<std::endl;
 
             saveKeyFramesAndFactor();
 
@@ -268,10 +271,6 @@ public:
 
             publishFrames();
         }
-        cout<<"odom_pub_cnt: "<<++odom_pub_cnt<<endl;
-        t_odm.tic_toc();
-        runtime += t_odm.toc();
-        cout<<"Odometry average run time: "<<runtime / odom_pub_cnt<<endl;
     }
 
     void gpsHandler(const nav_msgs::Odometry::ConstPtr& gpsMsg)
